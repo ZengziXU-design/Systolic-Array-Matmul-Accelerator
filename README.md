@@ -62,11 +62,25 @@ In the actual project flow, RTL simulation was performed using **Synopsys VCS**.
 ### Run tests
 
 ```bash
-iverilog -g2012 -I ./tb -I ./rtl -o simv_basic ./tb/tb_basic.v ./rtl/Proj_44_Xcel.v
+mkdir Systolic-Array-Matmul-Accelerator/build
+cd Systolic-Array-Matmul-Accelerator/build
+
+iverilog -g2012 -I ../tb -I ../rtl -o simv_basic ../tb/tb_basic.v ../rtl/Proj_44_Xcel.v
 vvp simv_basic
 
-iverilog -g2012 -I ./tb -I ./rtl -o simv_signed ./tb/tb_signed.v ./rtl/Proj_44_Xcel.v
+iverilog -g2012 -I ../tb -I ../rtl -o simv_signed ../tb/tb_signed.v ../rtl/Proj_44_Xcel.v
 vvp simv_signed
 
-iverilog -g2012 -I ./tb -I ./rtl -o simv_random ./tb/tb_random.v ./rtl/Proj_44_Xcel.v
+iverilog -g2012 -I ../tb -I ../rtl -o simv_random ../tb/tb_random.v ../rtl/Proj_44_Xcel.v
 vvp simv_random
+```
+
+## Physical Design Demo
+
+To provide a simple demonstration beyond RTL, the figure below shows a **non-confidential physical layout** of the systolic-array matrix multiplication accelerator after backend implementation.
+
+This layout was generated in a **TSMC 180nm** technology flow using **Cadence Innovus**.
+
+Only a public, non-sensitive top-level layout view is included here for demonstration purposes.
+
+![TSMC180nm layout demo](image/layout_TSMC180nm.png)

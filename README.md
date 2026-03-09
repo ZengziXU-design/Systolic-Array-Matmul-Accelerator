@@ -59,8 +59,14 @@ For the **public RTL version**, simulation is provided using **Icarus Verilog (`
 
 In the actual project flow, RTL simulation was performed using **Synopsys VCS**. However, for open-source release and reproducibility, this repository uses **Icarus Verilog** for the public testbench flow.
 
-### Run basic test
+### Run tests
 
 ```bash
 iverilog -g2012 -I ./tb -I ./rtl -o simv_basic ./tb/tb_basic.v ./rtl/Proj_44_Xcel.v
 vvp simv_basic
+
+iverilog -g2012 -I ./tb -I ./rtl -o simv_signed ./tb/tb_signed.v ./rtl/Proj_44_Xcel.v
+vvp simv_signed
+
+iverilog -g2012 -I ./tb -I ./rtl -o simv_random ./tb/tb_random.v ./rtl/Proj_44_Xcel.v
+vvp simv_random

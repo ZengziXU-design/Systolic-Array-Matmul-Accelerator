@@ -14,7 +14,62 @@ Main features:
 - skewed input scheduling for A and B
 - signed 8-bit input elements
 - local multiply-accumulate processing in each PE
-- reusable tiled compute structure for future scaling to larger matrix multiplication
+
+## Architecture Overview
+
+The figure below illustrates the **4×4 processing-element (PE) systolic array** used in the baseline-1 design.
+
+In this architecture, matrix **A** is streamed **row-wise from left to right**, while matrix **B** is streamed **column-wise from top to bottom**. Skewed input scheduling with zero padding is used so that operands arrive at each PE in the correct cycle alignment for multiply-accumulate computation.
+
+Each PE performs three local tasks:
+- receives one element from the **A** stream and one element from the **B** stream
+- computes the local multiply-accumulate update for the corresponding partial sum
+- forwards **A** horizontally and **B** vertically to neighboring PEs
+
+This systolic dataflow enables regular local interconnect, modular scalability, and efficient matrix multiplication through temporal accumulation across the array.
+
+![4x4 PE systolic array](image/4x4_PE.png)
+
+## Accelerator Interface
+
+The accelerator communicates with the external system through a **request/response streaming interface** with **val/rdy handshaking**.
+
+### Request channel
+
+The request interface uses the following signals:
+
+- **`xcel_reqstream_msg`**: packed accelerator request message
+- **`xcel_reqstream_val`**: request valid signal from the sender
+- **`xcel_reqstream_rdy`**: request ready signal from the accelerator
+
+A request transaction occurs only when both **`xcel_reqstream_val`** and **`xcel_reqstream_rdy`** are high in the same cycle.
+
+The request message format is defined as:
+
+- **`type_`**: request type (`READ` or `WRITE`)
+- **`addr`**: 5-bit accelerator register address
+- **`data`**: 32-bit write data
+
+This allows the external controller to either write matrix data / control registers into the accelerator or read back computation results.
+
+### Response channel
+
+The response interface uses the following signals:
+
+- **`xcel_respstream_msg`**: packed accelerator response message
+- **`xcel_respstream_val`**: response valid signal from the accelerator
+- **`xcel_respstream_rdy`**: response ready signal from the receiver
+
+A response transaction occurs only when both **`xcel_respstream_val`** and **`xcel_respstream_rdy`** are high in the same cycle.
+
+The response message format is defined as:
+
+- **`type_`**: response type (`READ` or `WRITE`)
+- **`data`**: 32-bit response data
+
+For write requests, the response indicates completion of the write transaction. For read requests, the response returns the requested 32-bit register value.
+
+This **latency-insensitive val/rdy protocol** cleanly decouples the accelerator from the surrounding system and makes the design easier to integrate, simulate, and verify.
 
 ## Repository Structure
 
